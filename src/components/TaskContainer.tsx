@@ -1,12 +1,17 @@
- 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Task, fetchTasks, addTask, updateTask, deleteTask } from '@/services/api';
-import TaskForm from './TaskForm';
-import TaskList from './TaskList';
-import ErrorMessage from './ErrorMessage';
-import LoadingSpinner from './LoadingSpinner';
+import { useState, useEffect } from "react";
+import {
+  Task,
+  fetchTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+} from "@/services/api";
+import TaskForm from "./TaskForm";
+import TaskList from "./TaskList";
+import ErrorMessage from "./ErrorMessage";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function TaskContainer() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -26,7 +31,7 @@ export default function TaskContainer() {
       // Limit to first 10 tasks for better performance
       setTasks(data.slice(0, 10));
     } catch (err) {
-      setError('Failed to load tasks. Please try again later.');
+      setError("Failed to load tasks. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -34,21 +39,21 @@ export default function TaskContainer() {
 
   const handleAddTask = async (title: string) => {
     if (!title.trim()) return;
-    
+
     try {
       setIsSubmitting(true);
       setError(null);
       const newTask = await addTask({
-        userId: 1, // Using a fixed userId for demo
+        userId: 1,  
         title,
         completed: false,
       });
-      
+
       // Note: JSONPlaceholder doesn't actually create the resource on their server
       // So we're adding it to our local state manually
       setTasks([newTask, ...tasks]);
     } catch (err) {
-      setError('Failed to add task. Please try again.');
+      setError("Failed to add task. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -59,11 +64,11 @@ export default function TaskContainer() {
       setError(null);
       const updatedTask = { ...task, completed: !task.completed };
       await updateTask(updatedTask);
-      
+
       // Update local state
-      setTasks(tasks.map(t => t.id === task.id ? updatedTask : t));
+      setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
     } catch (err) {
-      setError('Failed to update task. Please try again.');
+      setError("Failed to update task. Please try again.");
     }
   };
 
@@ -71,27 +76,27 @@ export default function TaskContainer() {
     try {
       setError(null);
       await deleteTask(id);
-      
+
       // Update local state
-      setTasks(tasks.filter(task => task.id !== id));
+      setTasks(tasks.filter((task) => task.id !== id));
     } catch (err) {
-      setError('Failed to delete task. Please try again.');
+      setError("Failed to delete task. Please try again.");
     }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <TaskForm onAddTask={handleAddTask} isSubmitting={isSubmitting} />
-      
+
       {error && <ErrorMessage message={error} />}
-      
+
       {isLoading ? (
         <LoadingSpinner />
       ) : (
-        <TaskList 
-          tasks={tasks} 
-          onToggleComplete={handleToggleComplete} 
-          onDeleteTask={handleDeleteTask} 
+        <TaskList
+          tasks={tasks}
+          onToggleComplete={handleToggleComplete}
+          onDeleteTask={handleDeleteTask}
         />
       )}
     </div>

@@ -1,102 +1,42 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Task,
-  fetchTasks,
-  addTask,
-  updateTask,
-  deleteTask,
-} from "@/services/api";
-import TaskForm from "./TaskForm";
-import TaskList from "./TaskList";
-import ErrorMessage from "./ErrorMessage";
-import LoadingSpinner from "./LoadingSpinner";
+import { useState } from "react";
 
-export default function TaskContainer() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface TaskFormProps {
+  onAddTask: (title: string) => Promise<void>;
+  isSubmitting: boolean;
+}
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
+export default function TaskForm({ onAddTask, isSubmitting }: TaskFormProps) {
+  const [title, setTitle] = useState("");
 
-  const loadTasks = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await fetchTasks();
-      // Limit to first 10 tasks for better performance
-      setTasks(data.slice(0, 10));
-    } catch (err) {
-      setError("Failed to load tasks. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddTask = async (title: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!title.trim()) return;
 
-    try {
-      setIsSubmitting(true);
-      setError(null);
-      const newTask = await addTask({
-        userId: 1,
-        title,
-        completed: false,
-      });
-
-      setTasks([newTask, ...tasks]);
-    } catch (err) {
-      setError("Failed to add task. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleToggleComplete = async (task: Task) => {
-    try {
-      setError(null);
-      const updatedTask = { ...task, completed: !task.completed };
-      await updateTask(updatedTask);
-
-      // Update local state
-      setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
-    } catch (err) {
-      setError("Failed to update task. Please try again.");
-    }
-  };
-
-  const handleDeleteTask = async (id: number) => {
-    try {
-      setError(null);
-      await deleteTask(id);
-
-      // Update local state
-      setTasks(tasks.filter((task) => task.id !== id));
-    } catch (err) {
-      setError("Failed to delete task. Please try again.");
-    }
+    await onAddTask(title);
+    setTitle("");
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <TaskForm onAddTask={handleAddTask} isSubmitting={isSubmitting} />
-
-      {error && <ErrorMessage message={error} />}
-
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <TaskList
-          tasks={tasks}
-          onToggleComplete={handleToggleComplete}
-          onDeleteTask={handleDeleteTask}
+    <form onSubmit={handleSubmit} className="mb-6">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Add a new task..."
+          className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isSubmitting}
         />
-      )}
-    </div>
+        <button
+          type="submit"
+          disabled={isSubmitting || !title.trim()}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Adding..." : "Add Task"}
+        </button>
+      </div>
+    </form>
   );
 }

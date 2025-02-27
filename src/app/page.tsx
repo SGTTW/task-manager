@@ -37,7 +37,7 @@
 //               width={20}
 //               height={20}
 //             />
-//             Deploy now
+//             Deploy now 
 //           </a>
 //           <a
 //             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
@@ -100,17 +100,17 @@
 //   );
 // }
 
-// src/app/page.tsx
-
 // -----------------
 
 import TaskContainer from "@/components/TaskContainer";
 
 export default function Home() {
   return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Task Manager</h1>
-      <TaskContainer />
-    </div>
+    <>
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Task Manager</h1>
+        <TaskContainer />
+      </div>
+    </>
   );
 }
